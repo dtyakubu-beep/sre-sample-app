@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sre-sample-app
+  namespace: default 
+  labels:
+    app: sre-sample-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sre-sample-app     
+  template:
+    metadata:
+      labels:
+        app: sre-sample-app
+      annotations:
+        prometheus.io./scrape: "true"
+        prometheus.io/port: "5000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: sre-sample-app
+        image: IMAGE_PLACEHOLDER
+        ports: 
+          - containerPort: 5000
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        redinessProbe:
+          httpGet:
+            path: ready
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"

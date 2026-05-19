@@ -1,0 +1,70 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    name: Build, Push and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-2
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Create ECR repository if not exists
+        run: |
+          aws ecr describe-repositories \
+            --repository-names sre-sample-app \
+            --region eu-west-2 || \
+          aws ecr create-repository \
+            --repository-name sre-sample-app \
+            --region eu-west-2
+
+      - name: Build Docker image
+        run: |
+          docker build -t sre-sample-app .
+
+      - name: Tag and push to ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker tag sre-sample-app \
+            $ECR_REGISTRY/sre-sample-app:$IMAGE_TAG
+          docker tag sre-sample-app \
+            $ECR_REGISTRY/sre-sample-app:latest
+          docker push $ECR_REGISTRY/sre-sample-app:$IMAGE_TAG
+          docker push $ECR_REGISTRY/sre-sample-app:latest
+
+      - name: Update kubeconfig
+        run: |
+          aws eks update-kubeconfig \
+            --region eu-west-2 \
+            --name sre-portfolio-cluster
+
+      - name: Deploy to EKS
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          sed -i "s|IMAGE_PLACEHOLDER|$ECR_REGISTRY/sre-sample-app:$IMAGE_TAG|g" \
+            kubernetes/deployment.yaml
+          kubectl apply -f kubernetes/deployment.yaml
+          kubectl apply -f kubernetes/service.yaml
+          kubectl rollout status deployment/sre-sample-app --timeout=120s
