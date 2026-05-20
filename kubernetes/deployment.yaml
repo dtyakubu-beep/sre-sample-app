@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: sre-sample-app
-          image: IMAGE_PLACEHOLDER
+          image: 591446362507.dkr.ecr.eu-west-2.amazonaws.com/sre-sample-app:latest
           ports:
             - containerPort: 5000
           livenessProbe:
