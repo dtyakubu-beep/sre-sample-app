@@ -5,5 +5,5 @@ resources:
 - service.yaml
 images:
 - name: 591446362507.dkr.ecr.eu-west-2.amazonaws.com/sre-sample-app
-  newName: 591446362307.dkr.ecr.eu-west-2.amazonaws.com/sre-sample-app
-  newTag: latest
+  newName: 591446362507.dkr.ecr.eu-west-2.amazonaws.com/sre-sample-app
+  newTag: 72411dbe36684f8702d88299015c2a864dbeb8bb
