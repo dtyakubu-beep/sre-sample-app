@@ -9,4 +9,4 @@ resources:
 images:
 - name: 591446362507.dkr.ecr.eu-west-2.amazonaws.com/sre-sample-app
   newName: 591446362507.dkr.ecr.eu-west-2.amazonaws.com/sre-sample-app
-  newTag: 89a7a8e32d8885b9e348e26c76e0a252b6828050
+  newTag: 56d9a8c7fdeb3da1ef15933af88b4075076d413a
