@@ -55,8 +55,11 @@ jobs:
 
       - name: Install Kustomize
         run: |
-          curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          curl -sLo kustomize.tar.gz \
+            https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv5.3.0/kustomize_v5.3.0_linux_amd64.tar.gz
+          tar -xzf kustomize.tar.gz
           sudo mv kustomize /usr/local/bin/
+          kustomize version
 
       - name: Update image tag in kustomization.yaml
         env:
