@@ -1,12 +1,9 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-
 resources:
 - deployment.yaml
 - service.yaml
-- namespace.yaml
-
 images:
 - name: 591446362507.dkr.ecr.eu-west-2.amazonaws.com/sre-sample-app
-  newName: 591446362507.dkr.ecr.eu-west-2.amazonaws.com/sre-sample-app
-  newTag: 56d9a8c7fdeb3da1ef15933af88b4075076d413a
+  newName: 591446362307.dkr.ecr.eu-west-2.amazonaws.com/sre-sample-app
+  newTag: latest
